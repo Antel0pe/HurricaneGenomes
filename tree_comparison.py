@@ -120,8 +120,8 @@ def plot_tree(root_id: str, edges: List[Tuple[str, str]], depth: Dict[str, int],
     plt.title(f"Storm similarity tree (root: {root_id})")
     plt.tight_layout()
     try:
-        plt.show(block=False)
-        plt.pause(0.1)
+        plt.show()
+        # plt.pause(0.1)
     except Exception:
         plt.show()
 

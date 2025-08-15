@@ -112,10 +112,43 @@ def vector_compare_single_to_many_greatcircle(single_20: np.ndarray, many_20: np
     return dist.sum(axis=1)
 
 
-def main(top_n: int = 5, vectorized: bool = False) -> None:
+def pairwise_compare_tracks_greatcircle_array(arr: np.ndarray, earth_radius_km: float = 6371.0) -> np.ndarray:
+    # arr: (N,20,2) lat,lon in degrees
+    if arr.size == 0:
+        return np.zeros((0, 0), dtype=float)
+    deg2rad = np.pi / 180.0
+    lat = arr[:, :, 0] * deg2rad  # (N,20)
+    lon = arr[:, :, 1] * deg2rad  # (N,20)
+    lat_i = lat[:, None, :]  # (N,1,20)
+    lon_i = lon[:, None, :]
+    lat_j = lat[None, :, :]  # (1,N,20)
+    lon_j = lon[None, :, :]
+    dlat = lat_j - lat_i  # (N,N,20)
+    dlon = lon_j - lon_i
+    a = np.sin(dlat / 2.0) ** 2 + np.cos(lat_i) * np.cos(lat_j) * (np.sin(dlon / 2.0) ** 2)
+    c = 2.0 * np.arcsin(np.minimum(1.0, np.sqrt(a)))
+    dist = earth_radius_km * c  # (N,N,20)
+    return dist.sum(axis=2)  # (N,N)
+
+
+def pairwise_compare_tracks_greatcircle(tracks: Dict[str, Track], earth_radius_km: float = 6371.0) -> _Tuple[np.ndarray, List[str]]:
+    arr, ids = preprocess_tracks_to_array(tracks)  # (N,20,2)
+    mat = pairwise_compare_tracks_greatcircle_array(arr, earth_radius_km=earth_radius_km)
+    return mat, ids
+
+
+def main(top_n: int = 5, vectorized: bool = False, pairwise: bool = False) -> None:
     tracks = load_tracks()
     if not tracks:
         print("No tracks loaded")
+        return
+    if pairwise:
+        arr, ids = preprocess_tracks_to_array(tracks)
+        t0 = time.perf_counter()
+        mat = pairwise_compare_tracks_greatcircle_array(arr)
+        dt = time.perf_counter() - t0
+        n = len(ids)
+        print(f"Pairwise great-circle similarity: N={n}, shape={mat.shape}, compare_time={dt:.4f}s (excl. preprocess)")
         return
     storm_id = random.choice(list(tracks.keys()))
     single = tracks[storm_id]
@@ -230,7 +263,8 @@ if __name__ == "__main__":
         import argparse
         p = argparse.ArgumentParser()
         p.add_argument("-v", "--vectorized", action="store_true")
+        p.add_argument("-p", "--pairwise", action="store_true")
         args = p.parse_args()
-        main(vectorized=args.vectorized)
+        main(vectorized=args.vectorized, pairwise=args.pairwise)
     except Exception:
         main()
