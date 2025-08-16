@@ -1,36 +1,28 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# HurricaneGenomes
 
 ## Getting Started
 
-First, run the development server:
+From the project root, run:
+cd frontend/
+npm run dev:all
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Project Overview - Claude
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+HurricaneGenomes analyzes hurricane track data from HURDAT2 to create "family trees" of storm patterns. The project treats each hurricane track as a unique "genome" and uses hierarchical clustering to identify relationships between storms based on their geographical paths.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Key Features
 
-## Learn More
+- **Track Comparison**: Uses great circle distance calculations to measure similarity between hurricane paths
+- **Hierarchical Clustering**: Applies average-linkage clustering to group similar storm tracks
+- **Visual Analysis**: Generates dendrograms and interactive maps showing storm relationships
+- **Parent-Child Trees**: Creates family tree structures showing how storms relate to each other
 
-To learn more about Next.js, take a look at the following resources:
+### How It Works
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. **Data Processing**: Loads hurricane track data from HURDAT2 format
+2. **Pairwise Comparison**: Calculates distances between all storm track pairs
+3. **Clustering**: Groups similar tracks using hierarchical clustering algorithms
+4. **Visualization**: Maps clusters with color-coded families and generates dendrograms
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The system identifies which storms follow similar paths and at what points they diverge, revealing patterns in hurricane behavior and potential "genetic" relationships between storm systems.
