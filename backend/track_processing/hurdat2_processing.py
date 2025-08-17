@@ -19,7 +19,10 @@ def _parse_coord(coord: str) -> Optional[float]:
 def load_storm_tracks(file_path: Optional[str] = None) -> Dict[str, List[List[float]]]:
     """Return {storm_id: [[lat, lon], ...]} from HURDAT2 file."""
     if file_path is None:
-        file_path = str(Path(__file__).with_name("hurdat2.txt"))
+        # Prefer project root hurdat2.txt, fallback to module dir
+        root_candidate = Path(__file__).resolve().parents[2] / "hurdat2.txt"
+        module_candidate = Path(__file__).with_name("hurdat2.txt")
+        file_path = str(root_candidate if root_candidate.exists() else module_candidate)
 
     tracks: Dict[str, List[List[float]]] = {}
     current_id: Optional[str] = None
