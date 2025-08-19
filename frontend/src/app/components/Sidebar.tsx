@@ -63,7 +63,7 @@ export default function Sidebar({ setTracks, selectedKeys, setSelectedKeys }: Pr
       <h2 className="text-lg font-semibold mb-2">Tracks</h2>
       <ListSearch items={keys} onClick={handleClick} placeholder="Search tracks" />
       <div className="mt-3" />
-      <TableWithAction items={selectedKeys} actionLabel="Remove" onAction={handleRemove} />
+      <TableWithAction items={selectedKeys} actionLabel="Remove" onAction={handleRemove} colors={colorMap} />
     </aside>
   );
 }
