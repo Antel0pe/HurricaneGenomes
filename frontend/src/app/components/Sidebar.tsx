@@ -3,15 +3,18 @@
 import { useEffect, useMemo, useState } from "react";
 import ListSearch from "./ListSearch";
 import TableWithAction from "./TableWithAction";
+import type { DisplayTrack, Track } from "@/types";
+import { randomColor } from "@/lib/color";
 
 type Props = {
-  setTracks: (tracks: number[][][]) => void;
+  setTracks: (tracks: DisplayTrack[]) => void;
   selectedKeys: string[];
   setSelectedKeys: (keys: string[]) => void;
 };
 
 export default function Sidebar({ setTracks, selectedKeys, setSelectedKeys }: Props) {
-  const [trackMap, setTrackMap] = useState<Record<string, number[][]>>({});
+  const [trackMap, setTrackMap] = useState<Record<string, Track>>({});
+  const [colorMap, setColorMap] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const api = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -26,14 +29,32 @@ export default function Sidebar({ setTracks, selectedKeys, setSelectedKeys }: Pr
   const handleClick = (key: string) => {
     const nextKeys = Array.from(new Set([...selectedKeys, key]));
     setSelectedKeys(nextKeys);
-    const nextTracks = nextKeys.map((k) => trackMap[k]).filter(Boolean) as number[][][];
+
+    const hasColor = colorMap[key];
+    const nextColorMap = hasColor ? colorMap : { ...colorMap, [key]: randomColor() };
+    setColorMap(nextColorMap);
+
+    const nextTracks: DisplayTrack[] = nextKeys
+      .map((k) => {
+        const t = trackMap[k];
+        if (!t) return null;
+        return { track: t, color: nextColorMap[k] } as DisplayTrack;
+      })
+      .filter(Boolean) as DisplayTrack[];
     setTracks(nextTracks);
   };
 
   const handleRemove = (key: string) => {
     const nextKeys = selectedKeys.filter((k) => k !== key);
     setSelectedKeys(nextKeys);
-    const nextTracks = nextKeys.map((k) => trackMap[k]).filter(Boolean) as number[][][];
+    const nextTracks: DisplayTrack[] = nextKeys
+      .map((k) => {
+        const t = trackMap[k];
+        const c = colorMap[k];
+        if (!t || !c) return null;
+        return { track: t, color: c } as DisplayTrack;
+      })
+      .filter(Boolean) as DisplayTrack[];
     setTracks(nextTracks);
   };
 

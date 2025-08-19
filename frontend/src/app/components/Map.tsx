@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import type { ComponentType } from "react";
+import type { DisplayTrack } from "@/types";
 
 type AnyProps = Record<string, unknown>;
 
@@ -18,7 +19,7 @@ const Polyline = dynamic(
   { ssr: false }
 ) as unknown as ComponentType<AnyProps>;
 
-type Props = { tracks?: number[][][] };
+type Props = { tracks?: DisplayTrack[] };
 
 export default function Map({ tracks = [] }: Props) {
   return (
@@ -28,8 +29,8 @@ export default function Map({ tracks = [] }: Props) {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
-        {tracks.map((coords, idx) => (
-          <Polyline key={idx} positions={coords as unknown as [number, number][]} />
+        {tracks.map((t, idx) => (
+          <Polyline key={idx} positions={t.track} pathOptions={{ color: t.color }} />
         ))}
       </MapContainer>
     </div>

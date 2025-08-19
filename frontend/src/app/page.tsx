@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import type { DisplayTrack } from "@/types";
 import Map from "./components/Map";
 import Sidebar from "./components/Sidebar";
 
 export default function Home() {
-  const [tracks, setTracks] = useState<number[][][]>([]);
+  const [tracks, setTracks] = useState<DisplayTrack[]>([]);
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   return (
     <main className="flex h-screen w-screen">
